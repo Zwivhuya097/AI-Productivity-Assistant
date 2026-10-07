@@ -1,24 +1,149 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { CheckCircle2, Clock, CalendarClock, FileText, Sparkles, AlertTriangle, ArrowRight, ListChecks } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { useAppState } from "@/lib/store";
+import { greeting, isoDate, daysUntil } from "@/lib/dates";
+import { Card, CardTitle, DeadlineBadge, EmptyState, PriorityDot } from "@/components/app/bits";
+import { ScheduleTimeline } from "@/components/app/ScheduleTimeline";
+import { useHydrated } from "@tanstack/react-router";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "Dashboard — WorkMate AI" },
+      { name: "description", content: "Your workday at a glance: tasks, deadlines, AI schedule and recent meeting summaries." },
+      { property: "og:title", content: "Dashboard — WorkMate AI" },
+      { property: "og:description", content: "Your workday at a glance: tasks, deadlines, AI schedule and recent meeting summaries." },
+    ],
+  }),
+  component: Dashboard,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function Stat({ icon: Icon, label, value, tone }: { icon: typeof Clock; label: string; value: string | number; tone: string }) {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="surface flex items-center gap-4 p-4">
+      <div className={`grid size-11 place-items-center rounded-xl ${tone}`}><Icon className="size-5" /></div>
+      <div>
+        <p className="text-2xl font-semibold tabular-nums font-display">{value}</p>
+        <p className="text-xs text-muted-foreground">{label}</p>
+      </div>
+    </div>
+  );
+}
+
+function Dashboard() {
+  const s = useAppState();
+  const hydrated = useHydrated();
+  const today = isoDate();
+  const done = s.tasks.filter((t) => t.completed).length;
+  const pending = s.tasks.length - done;
+  const pct = s.tasks.length ? Math.round((done / s.tasks.length) * 100) : 0;
+  const upcoming = s.tasks
+    .filter((t) => !t.completed && t.deadline && (daysUntil(t.deadline) ?? 99) <= 7)
+    .sort((a, b) => (a.deadline ?? "").localeCompare(b.deadline ?? ""));
+  const todayBlocks = s.schedule?.blocks.filter((b) => b.day === today) ?? [];
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-sm text-muted-foreground">
+            {hydrated ? new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric", year: "numeric" }) : "\u00a0"}
+          </p>
+          <h1 className="mt-1 text-2xl font-semibold sm:text-3xl">
+            {hydrated ? greeting() : "Hello"}, {s.settings.name}
+          </h1>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="outline"><Link to="/meetings"><FileText />Summarize Meeting</Link></Button>
+          <Button asChild variant="outline"><Link to="/planner"><CalendarClock />Plan My Day</Link></Button>
+          <Button asChild><Link to="/assistant"><Sparkles />Ask AI</Link></Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Stat icon={CheckCircle2} label="Tasks completed" value={done} tone="bg-success-soft text-success" />
+        <Stat icon={ListChecks} label="Pending tasks" value={pending} tone="bg-accent text-accent-foreground" />
+        <Stat icon={AlertTriangle} label="Due this week" value={upcoming.length} tone="bg-warning-soft text-warning" />
+        <Stat icon={FileText} label="Meeting summaries" value={s.meetings.length} tone="bg-secondary text-secondary-foreground" />
+      </div>
+
+      <div className="surface p-5">
+        <div className="mb-2 flex items-center justify-between text-sm">
+          <span className="font-medium">Overall progress</span>
+          <span className="tabular-nums text-muted-foreground">{pct}%</span>
+        </div>
+        <Progress value={pct} aria-label="Task completion" />
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-5">
+        <Card className="lg:col-span-3">
+          <CardTitle icon={CalendarClock} action={<Link to="/planner" className="text-xs font-medium text-primary hover:underline">Open planner</Link>}>
+            Today's schedule
+          </CardTitle>
+          {todayBlocks.length ? (
+            <ScheduleTimeline blocks={todayBlocks} limit={8} />
+          ) : (
+            <EmptyState
+              icon={CalendarClock}
+              title="No schedule for today yet"
+              description="Let AI prioritise your tasks and build a realistic plan around your working hours."
+              action={<Button asChild size="sm"><Link to="/planner">Plan my day</Link></Button>}
+            />
+          )}
+        </Card>
+
+        <div className="space-y-6 lg:col-span-2">
+          <Card>
+            <CardTitle icon={Clock} action={<Link to="/tasks" className="text-xs font-medium text-primary hover:underline">All tasks</Link>}>
+              Upcoming deadlines
+            </CardTitle>
+            {upcoming.length ? (
+              <ul className="space-y-2.5">
+                {upcoming.slice(0, 5).map((t) => (
+                  <li key={t.id} className="flex items-center gap-3">
+                    <PriorityDot priority={t.priority} />
+                    <span className="min-w-0 flex-1 truncate text-sm">{t.title}</span>
+                    <DeadlineBadge deadline={t.deadline} />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">Nothing due in the next 7 days.</p>
+            )}
+          </Card>
+
+          <Card>
+            <CardTitle icon={FileText} action={<Link to="/meetings" className="text-xs font-medium text-primary hover:underline">Summarizer</Link>}>
+              Recent meetings
+            </CardTitle>
+            {s.meetings.length ? (
+              <ul className="space-y-3">
+                {s.meetings.slice(0, 3).map((m) => (
+                  <li key={m.id}>
+                    <Link to="/meetings" search={{ id: m.id }} className="block rounded-lg p-2 -m-2 hover:bg-muted">
+                      <p className="text-sm font-medium">{m.result.title}</p>
+                      <p className="line-clamp-2 text-xs text-muted-foreground">{m.result.summary}</p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">No summaries yet. Try the demo meeting in the summarizer.</p>
+            )}
+          </Card>
+
+          <Link to="/assistant" className="surface group flex items-center gap-4 p-5 transition-shadow hover:shadow-lift">
+            <div className="grid size-11 place-items-center rounded-xl bg-primary text-primary-foreground"><Sparkles className="size-5" /></div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold">Ask WorkMate AI</p>
+              <p className="text-xs text-muted-foreground">"What should I work on first?"</p>
+            </div>
+            <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
