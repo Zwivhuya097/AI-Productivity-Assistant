@@ -48,7 +48,9 @@ function MeetingsPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | undefined>(search.id);
-  useEffect(() => setSelectedId(search.id), [search.id]);
+  useEffect(() => {
+    setSelectedId(search.id);
+  }, [search.id]);
   const current = meetings.find((m) => m.id === selectedId) ?? null;
 
   async function run() {
