@@ -25,6 +25,8 @@ export const Route = createFileRoute("/planner")({
       { name: "description", content: "Let AI prioritise your tasks and generate a realistic, non-overlapping daily or weekly schedule." },
       { property: "og:title", content: "AI Task Planner — WorkMate AI" },
       { property: "og:description", content: "Let AI prioritise your tasks and generate a realistic, non-overlapping daily or weekly schedule." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: PlannerPage,

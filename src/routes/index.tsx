@@ -15,6 +15,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Your workday at a glance: tasks, deadlines, AI schedule and recent meeting summaries." },
       { property: "og:title", content: "Dashboard — WorkMate AI" },
       { property: "og:description", content: "Your workday at a glance: tasks, deadlines, AI schedule and recent meeting summaries." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Dashboard,
@@ -22,9 +24,9 @@ export const Route = createFileRoute("/")({
 
 function Stat({ icon: Icon, label, value, tone }: { icon: typeof Clock; label: string; value: string | number; tone: string }) {
   return (
-    <div className="surface flex items-center gap-4 p-4">
-      <div className={`grid size-11 place-items-center rounded-xl ${tone}`}><Icon className="size-5" /></div>
-      <div>
+    <div className="surface flex min-h-28 items-center gap-3 p-4 transition-shadow hover:shadow-lift">
+      <div className={`grid size-10 shrink-0 place-items-center rounded-lg ${tone}`}><Icon className="size-5" /></div>
+      <div className="min-w-0">
         <p className="text-2xl font-semibold tabular-nums font-display">{value}</p>
         <p className="text-xs text-muted-foreground">{label}</p>
       </div>
@@ -52,7 +54,7 @@ function Dashboard() {
             {hydrated ? new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric", year: "numeric" }) : "\u00a0"}
           </p>
           <h1 className="mt-1 text-2xl font-semibold sm:text-3xl">
-            {hydrated ? greeting() : "Hello"}, {s.settings.name}
+            {hydrated ? greeting() : "Hello"}, <span className="text-primary">{s.settings.name}</span>
           </h1>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -63,13 +65,13 @@ function Dashboard() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Stat icon={CheckCircle2} label="Tasks completed" value={done} tone="bg-success-soft text-success" />
+        <Stat icon={CheckCircle2} label="Tasks completed" value={done} tone="bg-secondary text-secondary-foreground" />
         <Stat icon={ListChecks} label="Pending tasks" value={pending} tone="bg-accent text-accent-foreground" />
-        <Stat icon={AlertTriangle} label="Due this week" value={upcoming.length} tone="bg-warning-soft text-warning" />
-        <Stat icon={FileText} label="Meeting summaries" value={s.meetings.length} tone="bg-secondary text-secondary-foreground" />
+        <Stat icon={AlertTriangle} label="Due this week" value={upcoming.length} tone="bg-primary text-primary-foreground" />
+        <Stat icon={FileText} label="Meeting summaries" value={s.meetings.length} tone="bg-muted text-primary" />
       </div>
 
-      <div className="surface p-5">
+      <div className="border-y border-border py-5">
         <div className="mb-2 flex items-center justify-between text-sm">
           <span className="font-medium">Overall progress</span>
           <span className="tabular-nums text-muted-foreground">{pct}%</span>
@@ -78,7 +80,7 @@ function Dashboard() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-5">
-        <Card className="lg:col-span-3">
+        <Card className="lg:col-span-3 border-0 bg-transparent shadow-none px-0">
           <CardTitle icon={CalendarClock} action={<Link to="/planner" className="text-xs font-medium text-primary hover:underline">Open planner</Link>}>
             Today's schedule
           </CardTitle>
@@ -134,13 +136,13 @@ function Dashboard() {
             )}
           </Card>
 
-          <Link to="/assistant" className="surface group flex items-center gap-4 p-5 transition-shadow hover:shadow-lift">
-            <div className="grid size-11 place-items-center rounded-xl bg-primary text-primary-foreground"><Sparkles className="size-5" /></div>
+          <Link to="/assistant" className="group flex items-center gap-4 rounded-lg bg-primary p-5 text-primary-foreground transition-shadow hover:shadow-lift">
+            <div className="grid size-11 shrink-0 place-items-center rounded-lg bg-primary-foreground/15 text-primary-foreground"><Sparkles className="size-5" /></div>
             <div className="flex-1">
               <p className="text-sm font-semibold">Ask WorkMate AI</p>
-              <p className="text-xs text-muted-foreground">"What should I work on first?"</p>
+              <p className="text-xs text-primary-foreground/85">"What should I work on first?"</p>
             </div>
-            <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+            <ArrowRight className="size-4 shrink-0 text-primary-foreground transition-transform group-hover:translate-x-0.5" />
           </Link>
         </div>
       </div>

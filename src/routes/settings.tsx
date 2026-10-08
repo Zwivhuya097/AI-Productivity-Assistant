@@ -19,6 +19,8 @@ export const Route = createFileRoute("/settings")({
       { name: "description", content: "Set your name and working hours used by the AI planner." },
       { property: "og:title", content: "Settings — WorkMate AI" },
       { property: "og:description", content: "Set your name and working hours used by the AI planner." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: SettingsPage,
