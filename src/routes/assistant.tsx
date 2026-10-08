@@ -21,6 +21,8 @@ export const Route = createFileRoute("/assistant")({
       { name: "description", content: "Chat with WorkMate AI about your tasks, meetings and schedule." },
       { property: "og:title", content: "WorkMate AI Assistant" },
       { property: "og:description", content: "Chat with WorkMate AI about your tasks, meetings and schedule." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AssistantPage,

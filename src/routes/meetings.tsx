@@ -22,6 +22,8 @@ export const Route = createFileRoute("/meetings")({
       { name: "description", content: "Turn long meeting notes into a summary, decisions, action items and deadlines." },
       { property: "og:title", content: "Meeting Summarizer — WorkMate AI" },
       { property: "og:description", content: "Turn long meeting notes into a summary, decisions, action items and deadlines." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: MeetingsPage,

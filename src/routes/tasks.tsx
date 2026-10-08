@@ -16,6 +16,8 @@ export const Route = createFileRoute("/tasks")({
       { name: "description", content: "Add, edit, complete and organise all your tasks in one place." },
       { property: "og:title", content: "My Tasks — WorkMate AI" },
       { property: "og:description", content: "Add, edit, complete and organise all your tasks in one place." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: TasksPage,

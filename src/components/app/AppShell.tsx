@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Disclaimer } from "./Disclaimer";
 import { useAppState } from "@/lib/store";
+import { Button } from "@/components/ui/button";
 
 const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -63,7 +64,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col gap-8 bg-sidebar p-4 lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col gap-8 border-r border-sidebar-border bg-sidebar p-4 lg:flex">
         <div className="pt-2"><Brand /></div>
         <NavList />
         <div className="mt-auto rounded-lg border border-sidebar-border p-3 text-xs leading-relaxed text-sidebar-foreground/70">
@@ -74,13 +75,13 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* Mobile top bar */}
       <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-sidebar px-4 py-3 lg:hidden">
         <Brand />
-        <button
+        <Button variant="ghost" size="icon"
           aria-label={open ? "Close menu" : "Open menu"}
           onClick={() => setOpen((o) => !o)}
           className="grid size-10 place-items-center rounded-lg text-sidebar-accent-foreground hover:bg-sidebar-accent"
         >
           {open ? <X className="size-5" /> : <Menu className="size-5" />}
-        </button>
+        </Button>
       </header>
       {open && (
         <div className="fixed inset-0 top-[61px] z-20 bg-sidebar p-4 lg:hidden">
