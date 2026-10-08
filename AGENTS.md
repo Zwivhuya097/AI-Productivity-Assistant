@@ -11,3 +11,4 @@
 
 - App data (tasks, schedule, meeting summaries, chat, settings) lives in a localStorage-backed store in src/lib/store.ts — keeps the demo backend-free; move to Lovable Cloud if multi-device sync is needed.
 - All AI calls go through server functions in src/lib/ai.functions.ts using the streamed Responses helper in ai-gateway.server.ts; prompts and strict JSON schemas live in src/lib/prompts.ts — keeps keys server-side and outputs UI-ready.
+- Keep Vite optimizeDeps.ignoreOutdatedRequests false — rejecting stale dependency URLs prevents mixed React/React DOM generations and invalid-hook crashes in long-lived previews.
